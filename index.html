@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hypothesis Testing Tool — María Cangrejo · G11</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-label">Global Economics · Grade 11 · Term 3 · 2025–2026</div>
+      <h1>Hypothesis<br><em>Testing</em> Tool</h1>
+      <p class="header-sub">C8 · C9 · C10 — Interactive statistical inference engine · María Cangrejo</p>
+      <div class="ai-links">
+        <span class="ai-label">AI Conversation used to build this tool:</span>
+        <a href="https://claude.ai/share/9c0f1139-a6ea-4b25-a15e-164459a63234" target="_blank" class="ai-link">🤖 View Claude AI Conversation</a>
+      </div>
+    </div>
+    <div class="header-deco"></div>
+  </header>
+
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="c8"><span class="tab-code">C8</span><span class="tab-label">Manual Mode</span></button>
+    <button class="tab-btn" data-tab="c9"><span class="tab-code">C9</span><span class="tab-label">CSV Mode</span></button>
+    <button class="tab-btn" data-tab="c10"><span class="tab-code">C10</span><span class="tab-label">Report</span></button>
+  </nav>
+
+  <main>
+
+    <!-- ===== C8: MANUAL MODE ===== -->
+    <section id="tab-c8" class="tab-panel active">
+      <div class="panel-grid">
+        <div class="controls-col">
+          <div class="card">
+            <h2 class="card-title">Test Configuration</h2>
+
+            <div class="field-group">
+              <label class="field-label">Test Mode</label>
+              <div class="btn-group" id="modeGroup">
+                <button class="mode-btn active" data-mode="mean">Mean (μ)</button>
+                <button class="mode-btn" data-mode="proportion">Proportion (p)</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Test Direction</label>
+              <div class="btn-group" id="tailGroup">
+                <button class="tail-btn" data-tail="left">Left-tailed</button>
+                <button class="tail-btn active" data-tail="two">Two-tailed</button>
+                <button class="tail-btn" data-tail="right">Right-tailed</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Significance Level α</label>
+              <div class="slider-row">
+                <input type="range" id="alphaSlider" min="0.01" max="0.10" step="0.01" value="0.05"/>
+                <input type="number" id="alphaBox" min="0.01" max="0.10" step="0.01" value="0.05" class="num-box"/>
+              </div>
+            </div>
+
+            <div id="meanFields">
+              <div class="field-group">
+                <label class="field-label">Benchmark Mean (μ₀)</label>
+                <div class="slider-row">
+                  <input type="range" id="mu0Slider" min="0" max="200" step="1" value="100"/>
+                  <input type="number" id="mu0Box" value="100" class="num-box"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Sample Mean (x̄)</label>
+                <div class="slider-row">
+                  <input type="range" id="xbarSlider" min="0" max="200" step="0.1" value="105"/>
+                  <input type="number" id="xbarBox" value="105" class="num-box"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Standard Deviation (σ)</label>
+                <div class="slider-row">
+                  <input type="range" id="sigmaSlider" min="1" max="100" step="0.5" value="20"/>
+                  <input type="number" id="sigmaBox" value="20" class="num-box"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Sample Size (n)</label>
+                <div class="slider-row">
+                  <input type="range" id="nMeanSlider" min="5" max="500" step="1" value="50"/>
+                  <input type="number" id="nMeanBox" value="50" class="num-box"/>
+                </div>
+              </div>
+            </div>
+
+            <div id="propFields" style="display:none;">
+              <div class="field-group">
+                <label class="field-label">Benchmark Proportion (p₀)</label>
+                <div class="slider-row">
+                  <input type="range" id="p0Slider" min="0.01" max="0.99" step="0.01" value="0.50"/>
+                  <input type="number" id="p0Box" min="0.01" max="0.99" step="0.01" value="0.50" class="num-box"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Sample Proportion (p̂)</label>
+                <div class="slider-row">
+                  <input type="range" id="phatSlider" min="0.01" max="0.99" step="0.01" value="0.55"/>
+                  <input type="number" id="phatBox" min="0.01" max="0.99" step="0.01" value="0.55" class="num-box"/>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Sample Size (n)</label>
+                <div class="slider-row">
+                  <input type="range" id="nPropSlider" min="5" max="1000" step="1" value="100"/>
+                  <input type="number" id="nPropBox" value="100" class="num-box"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="output-col">
+          <div class="card graph-card">
+            <h2 class="card-title">Normal Curve · P-value Visualization</h2>
+            <canvas id="normalCanvas" width="560" height="280"></canvas>
+            <div class="canvas-legend" id="canvasLegend"></div>
+          </div>
+          <div class="card results-card">
+            <h2 class="card-title">Statistical Results</h2>
+            <div class="results-grid">
+              <div class="result-item"><span class="result-label">Test Statistic (z)</span><span class="result-value" id="zVal">—</span></div>
+              <div class="result-item"><span class="result-label">P-value</span><span class="result-value" id="pVal">—</span></div>
+              <div class="result-item"><span class="result-label">Critical Value(s)</span><span class="result-value" id="critVal">—</span></div>
+              <div class="result-item"><span class="result-label">Alpha (α)</span><span class="result-value" id="alphaVal">—</span></div>
+            </div>
+            <div class="decision-box" id="decisionBox">
+              <div class="decision-title" id="decisionTitle">—</div>
+              <div class="decision-text" id="decisionText">—</div>
+            </div>
+            <div class="errors-box">
+              <h3 class="errors-title">Types of Errors in This Context</h3>
+              <div class="errors-grid">
+                <div class="error-item type1">
+                  <span class="error-badge">Type I Error (α)</span>
+                  <span class="error-desc">Rejecting H₀ when it is actually true. The probability of this error equals α.</span>
+                </div>
+                <div class="error-item type2">
+                  <span class="error-badge">Type II Error (β)</span>
+                  <span class="error-desc">Failing to reject H₀ when it is actually false. The probability of this error equals β.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== C9: CSV MODE ===== -->
+    <section id="tab-c9" class="tab-panel">
+      <div class="panel-grid">
+        <div class="controls-col">
+          <div class="card">
+            <h2 class="card-title">Upload CSV Data</h2>
+            <p class="card-hint">Upload one of the three provided CSV files. The tool automatically detects columns and runs the hypothesis test.</p>
+
+            <div class="upload-zone" id="uploadZone">
+              <div class="upload-icon">↑</div>
+              <div class="upload-text">Drop CSV here or click to browse</div>
+              <input type="file" id="csvFile" accept=".csv" style="display:none"/>
+            </div>
+
+            <div id="csvControls" style="display:none;">
+              <div class="field-group">
+                <label class="field-label">Data Type</label>
+                <div class="btn-group" id="csvModeGroup">
+                  <button class="mode-btn active" data-csvmode="mean">Mean</button>
+                  <button class="mode-btn" data-csvmode="proportion">Proportion</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Group Column</label>
+                <select id="groupColSelect" class="select-box"></select>
+              </div>
+              <div class="field-group" id="valueColGroup">
+                <label class="field-label">Value Column</label>
+                <select id="valueColSelect" class="select-box"></select>
+              </div>
+              <div class="field-group" id="successColGroup" style="display:none;">
+                <label class="field-label">Success Column (0/1)</label>
+                <select id="successColSelect" class="select-box"></select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Benchmark Group</label>
+                <select id="benchGroupSelect" class="select-box"></select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Test Group</label>
+                <select id="testGroupSelect" class="select-box"></select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Test Direction</label>
+                <div class="btn-group" id="csvTailGroup">
+                  <button class="tail-btn" data-tail="left">Left</button>
+                  <button class="tail-btn active" data-tail="two">Two</button>
+                  <button class="tail-btn" data-tail="right">Right</button>
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Significance Level α</label>
+                <div class="slider-row">
+                  <input type="range" id="csvAlphaSlider" min="0.01" max="0.10" step="0.01" value="0.05"/>
+                  <input type="number" id="csvAlphaBox" min="0.01" max="0.10" step="0.01" value="0.05" class="num-box"/>
+                </div>
+              </div>
+              <button class="run-btn" id="runCsvBtn">Run Hypothesis Test</button>
+            </div>
+
+            <div class="sample-files">
+              <p class="field-label">Provided CSV files:</p>
+              <a href="data/dataset_1.csv" download class="file-link">↓ Dataset 1 — Mean (Control vs Treatment)</a>
+              <a href="data/dataset_2.csv" download class="file-link">↓ Dataset 2 — Proportion (Method_A vs Method_B)</a>
+              <a href="data/dataset_3.csv" download class="file-link">↓ Dataset 3 — Mean (Control vs Treatment)</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="output-col">
+          <div class="card graph-card" id="csvGraphCard" style="display:none;">
+            <h2 class="card-title">Normal Curve · CSV Test</h2>
+            <canvas id="csvCanvas" width="560" height="280"></canvas>
+          </div>
+          <div class="card results-card" id="csvResultsCard" style="display:none;">
+            <h2 class="card-title">Summary Statistics</h2>
+            <div class="summary-grid" id="summaryGrid"></div>
+            <h2 class="card-title" style="margin-top:1.5rem;">Test Results</h2>
+            <div class="results-grid" id="csvResultsGrid"></div>
+            <div class="decision-box" id="csvDecisionBox">
+              <div class="decision-title" id="csvDecisionTitle">—</div>
+              <div class="decision-text" id="csvDecisionText">—</div>
+            </div>
+          </div>
+          <div class="card" id="csvPreviewCard" style="display:none;">
+            <h2 class="card-title">Data Preview</h2>
+            <div class="table-wrap" id="csvPreview"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== C10: REPORT ===== -->
+    <section id="tab-c10" class="tab-panel">
+      <div class="report-wrap">
+        <article class="report" id="reportContent">
+
+          <div class="report-top-bar">
+            <div class="report-meta">APA Format · G11 Global Economics · Term 3 2025–2026 · María Cangrejo</div>
+            <button class="pdf-btn" onclick="printReport()">⬇ Download PDF</button>
+          </div>
+
+          <h1 class="report-title">Do Educational Interventions Significantly Improve Student Scores? A Hypothesis Testing Approach in the Colombian Educational Context</h1>
+
+          <section class="report-section">
+            <h2>Introduction</h2>
+            <p>Educational interventions aimed at improving student performance are a central concern in Colombian educational policy. According to the Fundación Empresarios por la Educación (2024), persistent score gaps between student groups in the Saber 11 national exam reflect structural differences in access to quality education and the effectiveness of pedagogical strategies. At the international level, the OECD (2023) documents that targeted educational interventions can significantly reduce achievement gaps when properly designed and implemented. This report applies hypothesis testing to evaluate whether a treatment intervention produced a statistically significant improvement in student scores compared to a control group, using data from the three professor-provided CSV datasets.</p>
+            <p>Understanding whether observed score differences reflect real effects or sampling variability is essential for evidence-based educational decision-making (Suárez &amp; García, 2024). All statistical calculations were performed using the interactive hypothesis testing tool developed in C8 and C9 of this project, available at: <a href="https://majocrabss.github.io/webpageGlobal_MariaCangrejo/" target="_blank">https://majocrabss.github.io/webpageGlobal_MariaCangrejo/</a></p>
+          </section>
+
+          <section class="report-section">
+            <h2>Research Question</h2>
+            <p>Is the mean score of students in the Treatment group significantly higher than the mean score of students in the Control group, at a significance level of α = 0.05?</p>
+          </section>
+
+          <section class="report-section">
+            <h2>Hypotheses, Test Direction, and Significance Level</h2>
+            <div class="hypo-box">
+              <div class="hypo-item"><strong>H₀:</strong> μ_Treatment = μ_Control &nbsp;&nbsp; (no significant difference in means)</div>
+              <div class="hypo-item"><strong>H₁:</strong> μ_Treatment &gt; μ_Control &nbsp;&nbsp; (Treatment group scores are higher)</div>
+              <div class="hypo-item"><strong>Test direction:</strong> Right-tailed</div>
+              <div class="hypo-item"><strong>Significance level:</strong> α = 0.05 &nbsp;&nbsp; <strong>Critical value:</strong> z* = 1.645</div>
+            </div>
+          </section>
+
+          <section class="report-section">
+            <h2>Deployed Webpage</h2>
+            <p>The hypothesis testing tool used to compute all results in this report is publicly deployed and accessible at:</p>
+            <p class="url-block"><strong>https://majocrabss.github.io/webpageGlobal_MariaCangrejo/</strong></p>
+            <p>The webpage includes the C8 manual interactive mode, the C9 CSV upload mode with automatic hypothesis testing, and this C10 report. A visible hyperlink to the AI conversation used during development appears in the page header and footer.</p>
+          </section>
+
+          <section class="report-section">
+            <h2>AI Conversation Reference</h2>
+            <p>This webpage and report were developed with the assistance of Claude (Anthropic, 2025), an AI assistant. The full conversation documenting the development process — including code generation, debugging, statistical guidance, and report writing — is publicly accessible at:</p>
+            <p class="url-block"><strong>https://claude.ai/share/9c0f1139-a6ea-4b25-a15e-164459a63234</strong></p>
+            <p>This link is also visible as a hyperlink in the deployed webpage header and footer.</p>
+          </section>
+
+          <section class="report-section">
+            <h2>CSV Data Upload — How It Works</h2>
+            <p>To use the CSV mode (C9 tab of the deployed webpage), the user clicks the upload zone or drags and drops a CSV file into it. The tool automatically reads the column headers and populates dropdown menus for the group column, value column (for mean tests) or success column (for proportion tests), benchmark group, and test group. The user selects the test direction and significance level, then clicks "Run Hypothesis Test." The tool computes summary statistics for each group, calculates the z-statistic, p-value, and critical value, displays the result on an interactive normal curve, and shows the statistical decision and a contextual conclusion.</p>
+
+            <p>The three professor-provided datasets were validated as follows:</p>
+            <table class="report-table">
+              <thead>
+                <tr><th>Dataset</th><th>Type</th><th>Group column</th><th>Value column</th><th>Benchmark</th><th>Test group</th><th>Direction</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>dataset_1.csv</td><td>Mean</td><td>group</td><td>score</td><td>Control</td><td>Treatment</td><td>Right-tailed</td></tr>
+                <tr><td>dataset_2.csv</td><td>Proportion</td><td>group</td><td>success</td><td>Method_B</td><td>Method_A</td><td>Right-tailed</td></tr>
+                <tr><td>dataset_3.csv</td><td>Mean</td><td>group</td><td>score</td><td>Control</td><td>Treatment</td><td>Right-tailed</td></tr>
+              </tbody>
+            </table>
+            <p class="screenshot-note">📸 <em>Note: Screenshots of each dataset uploaded and tested in the C9 mode are to be inserted here after webpage validation, as required by the C10 checklist.</em></p>
+          </section>
+
+          <section class="report-section">
+            <h2>Results</h2>
+            <p>The following results were obtained using Dataset 1 (dataset_1.csv) in the C9 CSV mode, with the Control group as benchmark and the Treatment group as the test group, right-tailed, α = 0.05:</p>
+            <table class="report-table">
+              <thead><tr><th>Statistic</th><th>Value</th></tr></thead>
+              <tbody>
+                <tr><td>Benchmark mean (Control, μ₀)</td><td>70.50</td></tr>
+                <tr><td>Sample mean (Treatment, x̄)</td><td>79.92</td></tr>
+                <tr><td>Standard deviation — Control (σ)</td><td>2.75</td></tr>
+                <tr><td>Sample size — Treatment (n)</td><td>12</td></tr>
+                <tr><td>Test statistic (z)</td><td>11.88</td></tr>
+                <tr><td>P-value</td><td>&lt; 0.0001</td></tr>
+                <tr><td>Critical value (z*)</td><td>1.645</td></tr>
+                <tr><td>Significance level (α)</td><td>0.05</td></tr>
+                <tr><td>Decision</td><td><strong>Reject H₀</strong></td></tr>
+              </tbody>
+            </table>
+            <p>Since the p-value (&lt; 0.0001) is substantially less than α = 0.05, and the test statistic z = 11.88 far exceeds the critical value z* = 1.645, we reject the null hypothesis.</p>
+          </section>
+
+          <section class="report-section">
+            <h2>Discussion</h2>
+            <p>The statistical evidence strongly supports the alternative hypothesis: the Treatment group scored significantly higher than the Control group. This result is consistent with international research on the effectiveness of structured educational interventions. The OECD (2023) reports that well-designed pedagogical interventions produce measurable and statistically significant gains in student achievement, particularly when they address specific learning gaps through targeted support.</p>
+            <p>In the Colombian context, the Fundación Empresarios por la Educación (2024) documents that structured academic support programs have shown positive effects on Saber 11 results in participating institutions. At the research level, Suárez and García (2024) identified instructional quality and targeted pedagogical support as among the strongest predictors of mathematics performance in the Saber 11, reinforcing the practical importance of the kind of intervention evaluated in this report.</p>
+
+            <h3>Statistical Errors in This Context</h3>
+            <div class="errors-grid" style="margin-top:0.75rem;">
+              <div class="error-item type1">
+                <span class="error-badge">Type I Error (α = 0.05)</span>
+                <span class="error-desc">Concluding the intervention improved scores when it actually did not. This could lead to scaling an ineffective program at significant cost to the educational system and to students.</span>
+              </div>
+              <div class="error-item type2">
+                <span class="error-badge">Type II Error (β)</span>
+                <span class="error-desc">Failing to detect a real improvement produced by the intervention. This would cause a genuinely effective program to be discontinued, denying students its measurable benefits.</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="report-section">
+            <h2>Conclusion</h2>
+            <p>At a significance level of α = 0.05, the hypothesis test provides very strong statistical evidence that the Treatment group scored significantly higher than the Control group (z = 11.88, p &lt; 0.0001). The null hypothesis is rejected. The conclusion matches the statistical decision: the educational intervention had a real and substantial effect on student performance. These findings are consistent with international evidence on effective pedagogical strategies (OECD, 2023) and with Colombian research on the predictors of Saber 11 performance (Fundación Empresarios por la Educación, 2024; Suárez &amp; García, 2024).</p>
+          </section>
+
+          <section class="report-section references">
+            <h2>References</h2>
+            <p>Fundación Empresarios por la Educación. (2024). <em>Análisis de resultados examen Saber 11° 2024</em>. FExE. https://www.fundacionexe.org.co/wp-content/uploads/2025/04/20240311_PPT_Análisis-Saber11_2024-4.pdf</p>
+            <p>OECD. (2023). <em>Education at a glance 2023: OECD indicators</em>. OECD Publishing. https://doi.org/10.1787/e13bef63-en</p>
+            <p>Suárez, J. A., &amp; García, H. A. (2024). Características del estudiantado nariñense en la prueba Saber 11 según el desempeño en matemáticas. <em>CPU-e, Revista de Investigación Educativa</em>, (39). https://doi.org/10.25009/cpue.v0i39.2880</p>
+          </section>
+
+        </article>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>G11 · Global Economics · Term 3 · 2025–2026 · Teacher: Nicolás López Cuéllar · Student: María Cangrejo</p>
+    <p>
+      <a href="https://majocrabss.github.io/webpageGlobal_MariaCangrejo/" target="_blank" class="footer-link">🌐 Deployed Webpage</a>
+      &nbsp;·&nbsp;
+      <a href="https://claude.ai/share/9c0f1139-a6ea-4b25-a15e-164459a63234" target="_blank" class="footer-link">🤖 AI Conversation</a>
+    </p>
+  </footer>
+
+  <script src="js/stats.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/c8.js"></script>
+  <script src="js/c9.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function printReport() {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('tab-c10').classList.add('active');
+      setTimeout(() => { window.print(); }, 150);
+    }
+  </script>
+</body>
+</html>
